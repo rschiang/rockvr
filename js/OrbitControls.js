@@ -14,7 +14,7 @@
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
 //    Pan - right mouse, or arrow keys / touch: three finter swipe
 
-THREE.OrbitControls = function ( object, domElement ) {
+THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 	this.object = object;
 
@@ -65,7 +65,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to false to disable tilting
 	this.enableTilt = true;
 	this.tiltLeftSpeed = 0.01;
-	this.tiltUpSpeed = 0.005;
+	this.tiltUpSpeed = 0.0075;
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
@@ -144,6 +144,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 			if ( scope.autoRotate && state === STATE.NONE ) {
 
 				rotateLeft( getAutoRotationAngle() );
+
+			}
+
+			if ( scope.enableTilt && supportsOrientation && state === STATE.NONE ) {
+
+				var deviceQuaternion = getDeviceQuaternion();
+				arrow.quaternion.copy( deviceQuaternion ).inverse();
 
 			}
 
@@ -280,7 +287,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyEnd = new THREE.Vector2();
 	var dollyDelta = new THREE.Vector2();
 
+	var deviceOrientation = {};
 	var screenOrientation = 0;
+	var supportsOrientation = ( window.DeviceOrientationEvent ) ? true : false;
 
 	function getAutoRotationAngle() {
 
@@ -418,6 +427,32 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 	}
+
+	var getDeviceQuaternion = function() {
+
+		var zee = new THREE.Vector3( 0, 0, 1 );
+		var euler = new THREE.Euler();
+		var quaternion = new THREE.Quaternion();
+		var q0 = new THREE.Quaternion();
+		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
+
+		return function() {
+
+			var alpha = THREE.Math.degToRad( deviceOrientation.alpha || 0 );
+			var beta = THREE.Math.degToRad( deviceOrientation.beta || 0 );
+			var gamma = THREE.Math.degToRad( deviceOrientation.gamma || 0 );
+			var orient = THREE.Math.degToRad( screenOrientation );
+
+			euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
+			quaternion.setFromEuler( euler ); // orient the device
+			quaternion.multiply( q1 ); // camera looks out the back of the device, not the top
+			quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) ); // adjust for screen orientation
+
+			return quaternion;
+
+		};
+
+	}();
 
 	//
 	// event callbacks - update the object state
@@ -679,38 +714,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	var handleDeviceOrientation = function() {
+	function handleDeviceOrientation( event ) {
 
-		var zee = new THREE.Vector3( 0, 0, 1 );
-		var euler = new THREE.Euler();
-		var quaternion = new THREE.Quaternion();
-		var q0 = new THREE.Quaternion();
-		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
+		deviceOrientation = event;
 
-		return function ( event ) {
-
-			var alpha = THREE.Math.degToRad( event.alpha );
-			var beta = THREE.Math.degToRad( event.beta );
-			var gamma = THREE.Math.degToRad( event.gamma );
-			var orient = THREE.Math.degToRad( screenOrientation );
-
-			euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
-			quaternion.setFromEuler( euler ); // orient the device
-			quaternion.multiply( q1 ); // camera looks out the back of the device, not the top
-			quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) ); // adjust for screen orientation
-
-			euler.setFromQuaternion( quaternion, 'YXZ' );	// Read back the value
-
-			console.log( euler.toArray() )
-
-			rotateLeft(euler.x * scope.tiltLeftSpeed);
-			rotateUp(euler.y * scope.tiltUpSpeed);
-
-			scope.update();
-
-		};
-
-	}();
+	}
 
 	function handleDeviceMotion( event ) {
 
@@ -948,7 +956,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	function onDeviceOrientation( event ) {
 
 		if ( scope.enabled === false || scope.enableTilt === false ) return;
-		if ( state !== STATE.NONE ) return;
 
 		handleDeviceOrientation( event );
 

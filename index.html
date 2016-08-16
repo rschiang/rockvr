@@ -39,8 +39,12 @@
             var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
             camera.position.set(0, 0, 1000);
 
+
+            var arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), 500, 0x2d7500, 50, 50);
+            scene.add(arrow);
+
             // Set up orbit controls
-            var controls = new THREE.OrbitControls(camera, canvas);
+            var controls = new THREE.OrbitControls(camera, canvas, scene);
             controls.enablePan = false;
             controls.enableZoom = false;
             controls.enableKeys = false;
@@ -58,6 +62,10 @@
             })();
             sphere.position.set(0, 0, 1000);
             scene.add(sphere);
+
+            var helper = new THREE.AxisHelper(1000);
+            scene.add(helper);
+
 
             // Finally, declare event handlers
             return {
