@@ -1,0 +1,18 @@
+{
+  "name": "ntu-go",
+  "version": "1.0.0",
+  "description": "Simple 3D demonstration",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rschiang/ntu-go.git"
+  },
+  "author": "Poren Chiang <ren.chiang@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rschiang/ntu-go/issues"
+  },
+  "homepage": "https://github.com/rschiang/ntu-go#readme",
+  "dependencies": {
+    "three": "^0.79.0"
+  }
+}
