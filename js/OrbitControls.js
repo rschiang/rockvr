@@ -247,15 +247,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		window.removeEventListener( 'keydown', onKeyDown, false );
 
-		if ( window.DeviceOrientationEvent ) {
-
-			window.removeEventListener( 'deviceorientation', onDeviceOrientation, false );
-			window.removeEventListener( 'orientationchange', onScreenOrientation, false );
-
-		}
-		else if ( window.DeviceMotionEvent )
-			window.removeEventListener( 'devicemotion', onDeviceMotion, false )
-
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
 	};
@@ -296,7 +287,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyEnd = new THREE.Vector2();
 	var dollyDelta = new THREE.Vector2();
 
-	var deviceOrientation = {};
 	var screenOrientation = 0;
 	var supportsOrientation = window.DeviceOrientationEvent ? true : false;
 
@@ -735,16 +725,22 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleDeviceOrientation( event ) {
 
-		//console.log( event.alpha + ', ' + event.beta + ', ' + event.gamma );
+		rotateEnd.set(event.gamma, event.beta);
+		rotateDelta.subVectors(rotateEnd, rotateStart);
 
-		deviceOrientation = event;
+		rotateLeft(rotateDelta.x * scope.tiltSpeed);
+		rotateUp(rotateDelta.y * scope.tiltSpeed);
+
+		rotateStart.copy(rotateEnd);
+
+		scope.update();
 
 	}
 
 	function handleDeviceMotion( event ) {
 
-		rotateLeft( -event.rotationRate.alpha * scope.tiltLeftSpeed );
-		rotateUp( -event.rotationRate.beta * scope.tiltUpSpeed );
+		rotateLeft(event.rotationRate.beta * scope.tiltSpeed);
+		rotateUp(event.rotationRate.alpha * scope.tiltSpeed);
 
 		scope.update();
 
@@ -982,16 +978,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function onScreenOrientation( event ) {
-
-		screenOrientation = window.orientation || 0;
-
-	}
-
 	function onDeviceMotion( event ) {
 
-		if ( scope.enabled === false || scope.enableTilt === false ) return;
-		if ( state === STATE.TOUCH_ROTATE ) return; // Only trigger when no user interaction
+		if ( scope.enabled === false || !scope.enableTilt ) return;
 
 		handleDeviceMotion( event );
 
