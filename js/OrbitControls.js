@@ -671,8 +671,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		rotateEnd.set(event.gamma, event.beta);
 		rotateDelta.subVectors(rotateEnd, rotateStart);
 
-		scope.rotateLeft(rotateDelta.x * scope.tiltSpeed);
-		scope.rotateUp(rotateDelta.y * scope.tiltSpeed);
+		rotateLeft(rotateDelta.x * scope.tiltSpeed);
+		rotateUp(rotateDelta.y * scope.tiltSpeed);
 
 		rotateStart.copy(rotateEnd);
 
@@ -682,8 +682,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleDeviceMotion( event ) {
 
-		scope.rotateLeft(event.rotationRate.beta * scope.tiltSpeed);
-		scope.rotateUp(event.rotationRate.alpha * scope.tiltSpeed);
+		rotateLeft(event.rotationRate.beta * scope.tiltSpeed);
+		rotateUp(event.rotationRate.alpha * scope.tiltSpeed);
 
 		scope.update();
 
