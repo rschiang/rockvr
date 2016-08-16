@@ -229,6 +229,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		window.removeEventListener( 'keydown', onKeyDown, false );
 
+		if ( window.DeviceOrientationEvent ) {
+
+			window.removeEventListener( 'deviceorientation', onDeviceOrientation, false );
+			window.removeEventListener( 'orientationchange', onScreenOrientation, false );
+
+		}
+		else if ( window.DeviceMotionEvent )
+			window.removeEventListener( 'devicemotion', onDeviceMotion, false )
+
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
 	};
@@ -268,6 +277,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyStart = new THREE.Vector2();
 	var dollyEnd = new THREE.Vector2();
 	var dollyDelta = new THREE.Vector2();
+
+	var tiltStart = new THREE.Vector2();
+	var tiltEnd = new THREE.Vector2();
+	var tiltDelta = new THREE.Vector2();
+
+	var screenOrientation = 0;
 
 	function getAutoRotationAngle() {
 
@@ -668,13 +683,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleDeviceOrientation( event ) {
 
-		rotateEnd.set(event.gamma, event.beta);
-		rotateDelta.subVectors(rotateEnd, rotateStart);
+		console.log( event.alpha + ', ' + event.beta + ', ' + event.gamma );
 
-		rotateLeft(rotateDelta.x * scope.tiltSpeed);
-		rotateUp(rotateDelta.y * scope.tiltSpeed);
+		tiltEnd.set( event.alpha, event.beta );
+		tiltDelta.subVectors( tiltEnd, tiltStart );
 
-		rotateStart.copy(rotateEnd);
+		rotateLeft( -tiltDelta.x * scope.tiltSpeed );
+		rotateUp( -tiltDelta.y * scope.tiltSpeed );
+
+		tiltStart.copy( tiltEnd );
 
 		scope.update();
 
@@ -682,8 +699,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleDeviceMotion( event ) {
 
-		rotateLeft(event.rotationRate.beta * scope.tiltSpeed);
-		rotateUp(event.rotationRate.alpha * scope.tiltSpeed);
+		rotateLeft( event.rotationRate.beta * scope.tiltSpeed );
+		rotateUp( event.rotationRate.alpha * scope.tiltSpeed );
 
 		scope.update();
 
@@ -915,15 +932,23 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onDeviceOrientation( event ) {
 
-		if ( scope.enabled === false || !scope.enableTilt ) return;
+		if ( scope.enabled === false || scope.enableTilt === false ) return;
+		if ( state === STATE.TOUCH_ROTATE ) return; // Only trigger when no user interaction
 
 		handleDeviceOrientation( event );
 
 	}
 
+	function onScreenOrientation( event ) {
+
+		screenOrientation = window.orientation || 0;
+
+	}
+
 	function onDeviceMotion( event ) {
 
-		if ( scope.enabled === false || !scope.enableTilt ) return;
+		if ( scope.enabled === false || scope.enableTilt === false ) return;
+		if ( state === STATE.TOUCH_ROTATE ) return; // Only trigger when no user interaction
 
 		handleDeviceMotion( event );
 
@@ -945,7 +970,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	if ( window.DeviceOrientationEvent )
 		window.addEventListener( 'deviceorientation', onDeviceOrientation, false );
-
 	else if ( window.DeviceMotionEvent )
 		window.addEventListener( 'devicemotion', onDeviceMotion, false )
 
