@@ -230,7 +230,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Expose our state
 
-	this.STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+	var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+	this.STATE = STATE;
 
 	this.state = STATE.NONE;
 

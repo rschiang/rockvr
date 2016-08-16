@@ -48,10 +48,18 @@
                 mouse.enableDamping = true;
                 mouse.dampingFactor = 0.25;
 
-                var gyroscope = new THREE.DeviceOrientationControls(camera);
+                var gyroscopeAvailable = !!(window.DeviceOrientationEvent);
+                var gyroscope = gyroscopeAvailable ? new THREE.DeviceOrientationControls(camera) : null;
+
                 return {
                     orbit: mouse,
-                    device: gyroscope
+                    device: gyroscope,
+                    update: function() {
+                        if (gyroscopeAvailable && controls.orbit.state == controls.orbit.STATE.NONE)
+                            controls.device.update();
+                        else
+                            controls.orbit.update();
+                    }
                 }
             })();
 
@@ -71,9 +79,7 @@
             return {
                 render: function onRender() {
                     window.requestAnimationFrame(onRender);
-                    controls.orbit.update();
-                    if (controls.orbit.state == controls.orbit.STATE.NONE)
-                        controls.device.update();
+                    controls.update();
                     renderer.render(scene, camera);
                 },
                 resize: function onResize() {
