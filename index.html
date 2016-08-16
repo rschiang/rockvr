@@ -46,6 +46,7 @@
                 mouse.enableZoom = true;
                 mouse.enableKeys = false;
                 mouse.enableDamping = false;
+                mouse.rotateSpeed = 0.618;
 
                 var gyroscopeAvailable = !!(window.DeviceOrientationEvent);
                 var gyroscope = gyroscopeAvailable ? new THREE.DeviceOrientationControls(camera) : null;
@@ -62,7 +63,7 @@
 
             // Declare global photosphere
             var sphere = (function() {
-                var geometry = new THREE.SphereGeometry(4500, 16, 12);
+                var geometry = new THREE.SphereGeometry(4500, 16, 24);
                 var material = new THREE.MeshBasicMaterial({
                     map: new THREE.TextureLoader().load('assets/ntu.jpg')
                 });
