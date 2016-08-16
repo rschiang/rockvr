@@ -915,7 +915,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onDeviceOrientation( event ) {
 
-		if ( scope.enabled === false || scope.enableTilt ) return;
+		if ( scope.enabled === false || !scope.enableTilt ) return;
 
 		handleDeviceOrientation( event );
 
@@ -923,7 +923,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onDeviceMotion( event ) {
 
-		if ( scope.enabled === false || scope.enableTilt ) return;
+		if ( scope.enabled === false || !scope.enableTilt ) return;
 
 		handleDeviceMotion( event );
 
