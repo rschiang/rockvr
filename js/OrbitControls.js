@@ -147,6 +147,23 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			}
 
+			if ( scope.enableTilt && supportsOrientation && state === STATE.NONE ) {
+
+				var deviceQuaternion = getDeviceQuaternion();
+
+				var deviceOffset = object.up.clone();
+				deviceOffset.applyQuaternion(deviceQuaternion);
+
+				var deviceSpherical = new THREE.Spherical();
+				deviceSpherical.setFromVector3(deviceOffset);
+
+				rotateLeft( -deviceSpherical.theta * scope.tiltLeftSpeed );
+				rotateUp( -deviceSpherical.phi * scope.tiltUpSpeed );
+
+				console.log( deviceSpherical.phi + ', ' + deviceSpherical.theta );
+
+			}
+
 			spherical.theta += sphericalDelta.theta;
 			spherical.phi += sphericalDelta.phi;
 
@@ -279,11 +296,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyEnd = new THREE.Vector2();
 	var dollyDelta = new THREE.Vector2();
 
-	var tiltStart = new THREE.Vector2(90, 90);
-	var tiltEnd = new THREE.Vector2();
-	var tiltDelta = new THREE.Vector2();
-
+	var deviceOrientation = {};
 	var screenOrientation = 0;
+	var supportsOrientation = window.DeviceOrientationEvent ? true : false;
 
 	function getAutoRotationAngle() {
 
@@ -421,6 +436,42 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 	}
+
+	var getDeviceQuaternion = function() {
+
+		var zee = new THREE.Vector3( 0, 0, 1 );
+
+		var euler = new THREE.Euler();
+
+		var q0 = new THREE.Quaternion();
+
+		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
+
+		return function() {
+
+			var alpha = deviceOrientation.alpha ? THREE.Math.degToRad( deviceOrientation.alpha ) /*+ this.alphaOffsetAngle*/ : 0; // Z
+
+			var beta = deviceOrientation.beta ? THREE.Math.degToRad( deviceOrientation.beta ) : 0; // X'
+
+			var gamma = deviceOrientation.gamma ? THREE.Math.degToRad( deviceOrientation.gamma ) : 0; // Y''
+
+			var orient = screenOrientation ? THREE.Math.degToRad( screenOrientation ) : 0; // O
+
+			var quaternion = new THREE.Quaternion();
+
+			euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
+
+			quaternion.setFromEuler( euler ); // orient the device
+
+			quaternion.multiply( q1 ); // camera looks out the back of the device, not the top
+
+			quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) ); // adjust for screen orientation
+
+			return quaternion;
+
+		}
+
+	}();
 
 	//
 	// event callbacks - update the object state
@@ -686,24 +737,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		//console.log( event.alpha + ', ' + event.beta + ', ' + event.gamma );
 
-		tiltEnd.set( event.alpha, event.beta );
-		tiltDelta.subVectors( tiltEnd, tiltStart );
-
-		// Normalize delta
-		if ( tiltDelta.x >= 180 )
-			tiltDelta.setX( tiltDelta.x - 360 );
-
-		else if ( tiltDelta.x <= -180 )
-			tiltDelta.setX( tiltDelta.x + 360 );
-
-		console.log( tiltDelta.x + ', ' + tiltDelta.y );
-
-		rotateLeft( -tiltDelta.x * scope.tiltLeftSpeed );
-		rotateUp( -tiltDelta.y * scope.tiltUpSpeed );
-
-		tiltStart.copy( tiltEnd );
-
-		scope.update();
+		deviceOrientation = event;
 
 	}
 
@@ -943,7 +977,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	function onDeviceOrientation( event ) {
 
 		if ( scope.enabled === false || scope.enableTilt === false ) return;
-		if ( state === STATE.TOUCH_ROTATE ) return; // Only trigger when no user interaction
 
 		handleDeviceOrientation( event );
 
@@ -980,6 +1013,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	if ( window.DeviceOrientationEvent )
 		window.addEventListener( 'deviceorientation', onDeviceOrientation, false );
+
 	else if ( window.DeviceMotionEvent )
 		window.addEventListener( 'devicemotion', onDeviceMotion, false )
 
