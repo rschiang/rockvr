@@ -64,7 +64,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Set to false to disable tilting
 	this.enableTilt = true;
-	this.tiltSpeed = 0.01;
+	this.tiltLeftSpeed = 0.02;
+	this.tiltUpSpeed = 0.01;
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
@@ -278,7 +279,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyEnd = new THREE.Vector2();
 	var dollyDelta = new THREE.Vector2();
 
-	var tiltStart = new THREE.Vector2();
+	var tiltStart = new THREE.Vector2(90, 90);
 	var tiltEnd = new THREE.Vector2();
 	var tiltDelta = new THREE.Vector2();
 
@@ -683,13 +684,22 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleDeviceOrientation( event ) {
 
-		console.log( event.alpha + ', ' + event.beta + ', ' + event.gamma );
+		//console.log( event.alpha + ', ' + event.beta + ', ' + event.gamma );
 
 		tiltEnd.set( event.alpha, event.beta );
 		tiltDelta.subVectors( tiltEnd, tiltStart );
 
-		rotateLeft( -tiltDelta.x * scope.tiltSpeed );
-		rotateUp( -tiltDelta.y * scope.tiltSpeed );
+		// Normalize delta
+		if ( tiltDelta.x >= 180 )
+			tiltDelta.setX( tiltDelta.x - 360 );
+
+		else if ( tiltDelta.x <= -180 )
+			tiltDelta.setX( tiltDelta.x + 360 );
+
+		console.log( tiltDelta.x + ', ' + tiltDelta.y );
+
+		rotateLeft( -tiltDelta.x * scope.tiltLeftSpeed );
+		rotateUp( -tiltDelta.y * scope.tiltUpSpeed );
 
 		tiltStart.copy( tiltEnd );
 
@@ -699,8 +709,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleDeviceMotion( event ) {
 
-		rotateLeft( event.rotationRate.beta * scope.tiltSpeed );
-		rotateUp( event.rotationRate.alpha * scope.tiltSpeed );
+		rotateLeft( -event.rotationRate.alpha * scope.tiltLeftSpeed );
+		rotateUp( -event.rotationRate.beta * scope.tiltUpSpeed );
 
 		scope.update();
 
