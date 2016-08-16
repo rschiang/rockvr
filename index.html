@@ -45,8 +45,7 @@
                 mouse.enablePan = false;
                 mouse.enableZoom = true;
                 mouse.enableKeys = false;
-                mouse.enableDamping = true;
-                mouse.dampingFactor = 0.25;
+                mouse.enableDamping = false;
 
                 var gyroscopeAvailable = !!(window.DeviceOrientationEvent);
                 var gyroscope = gyroscopeAvailable ? new THREE.DeviceOrientationControls(camera) : null;
@@ -57,8 +56,6 @@
                     update: function() {
                         if (gyroscopeAvailable && controls.orbit.state == controls.orbit.STATE.NONE)
                             controls.device.update();
-                        else
-                            controls.orbit.update();
                     }
                 }
             })();
