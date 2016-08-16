@@ -64,8 +64,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// Set to false to disable tilting
 	this.enableTilt = true;
-	this.tiltLeftSpeed = 0.02;
-	this.tiltUpSpeed = 0.01;
+	this.tiltLeftSpeed = 0.01;
+	this.tiltUpSpeed = 0.005;
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
@@ -703,8 +703,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			console.log( euler.toArray() )
 
-			rotateLeft(euler.x * scope.tiltSpeed);
-			rotateUp(euler.y * scope.tiltSpeed);
+			rotateLeft(euler.x * scope.tiltLeftSpeed);
+			rotateUp(euler.y * scope.tiltUpSpeed);
 
 			scope.update();
 
@@ -714,8 +714,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleDeviceMotion( event ) {
 
-		rotateLeft(event.rotationRate.beta * scope.tiltSpeed);
-		rotateUp(event.rotationRate.alpha * scope.tiltSpeed);
+		rotateLeft(event.rotationRate.beta * scope.tiltLeftSpeed);
+		rotateUp(event.rotationRate.alpha * scope.tiltUpSpeed);
 
 		scope.update();
 
@@ -948,6 +948,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	function onDeviceOrientation( event ) {
 
 		if ( scope.enabled === false || scope.enableTilt === false ) return;
+		if ( state !== STATE.NONE ) return;
 
 		handleDeviceOrientation( event );
 
@@ -956,6 +957,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	function onDeviceMotion( event ) {
 
 		if ( scope.enabled === false || scope.enableTilt === false ) return;
+		if ( state !== STATE.NONE ) return;
 
 		handleDeviceMotion( event );
 
