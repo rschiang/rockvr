@@ -19,7 +19,7 @@
         }
     </style>
     <script src="node_modules/three/build/three.min.js"></script>
-    <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
+    <script src="js/OrbitControls.js"></script>
     <script src="node_modules/three/examples/js/controls/DeviceOrientationControls.js"></script>
 </head>
 <body>
@@ -71,8 +71,9 @@
             return {
                 render: function onRender() {
                     window.requestAnimationFrame(onRender);
-                    controls.device.update();
                     controls.orbit.update();
+                    if (controls.orbit.state == controls.orbit.STATE.NONE)
+                        controls.device.update();
                     renderer.render(scene, camera);
                 },
                 resize: function onResize() {
