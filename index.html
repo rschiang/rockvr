@@ -25,6 +25,8 @@
 <body>
     <script>
         var App = (function() {
+            'use strict';
+
             // Initialize scene
             var scene = new THREE.Scene();
             var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -36,6 +38,7 @@
 
             // Set up camera and controls
             var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.set(0, 0, 1000);
             var controls = (function() {
                 var mouse = new THREE.OrbitControls(camera, canvas);
                 mouse.enableRotate = true;
@@ -61,6 +64,7 @@
                 geometry.scale(-1, 1, 1);   // Invert face
                 return new THREE.Mesh(geometry, material);
             })();
+            sphere.position.set(0, 0, 1000);
             scene.add(sphere);
 
             // Finally, declare event handlers
