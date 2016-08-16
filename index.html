@@ -70,6 +70,14 @@
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
                     renderer.setSize(window.innerWidth, window.innerHeight);
+                },
+                fullscreen: function() {
+                    if (canvas.requestFullscreen)
+                        canvas.requestFullscreen();
+                    else if (canvas.webkitRequestFullScreen)
+                        canvas.webkitRequestFullScreen();
+                    else if (canvas.mozRequestFullScreen)
+                        canvas.mozRequestFullScreen();
                 }
             };
         })();

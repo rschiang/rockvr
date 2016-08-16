@@ -147,23 +147,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			}
 
-			if ( scope.enableTilt && supportsOrientation && state === STATE.NONE ) {
-
-				var deviceQuaternion = getDeviceQuaternion();
-
-				var deviceOffset = object.up.clone();
-				deviceOffset.applyQuaternion(deviceQuaternion);
-
-				var deviceSpherical = new THREE.Spherical();
-				deviceSpherical.setFromVector3(deviceOffset);
-
-				rotateLeft( -deviceSpherical.theta * scope.tiltLeftSpeed );
-				rotateUp( -deviceSpherical.phi * scope.tiltUpSpeed );
-
-				console.log( deviceSpherical.phi + ', ' + deviceSpherical.theta );
-
-			}
-
 			spherical.theta += sphericalDelta.theta;
 			spherical.phi += sphericalDelta.phi;
 
@@ -247,6 +230,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		window.removeEventListener( 'keydown', onKeyDown, false );
 
+		if ( window.DeviceOrientationEvent ) {
+
+			window.removeEventListener( 'deviceorientation', onDeviceOrientation, false );
+			window.removeEventListener( 'orientationchange', onScreenOrientation, false );
+
+		}
+
+		else if ( window.DeviceMotionEvent )
+			window.removeEventListener( 'devicemotion', onDeviceMotion, false )
+
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
 	};
@@ -288,7 +281,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyDelta = new THREE.Vector2();
 
 	var screenOrientation = 0;
-	var supportsOrientation = window.DeviceOrientationEvent ? true : false;
 
 	function getAutoRotationAngle() {
 
@@ -426,42 +418,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 	}
-
-	var getDeviceQuaternion = function() {
-
-		var zee = new THREE.Vector3( 0, 0, 1 );
-
-		var euler = new THREE.Euler();
-
-		var q0 = new THREE.Quaternion();
-
-		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
-
-		return function() {
-
-			var alpha = deviceOrientation.alpha ? THREE.Math.degToRad( deviceOrientation.alpha ) /*+ this.alphaOffsetAngle*/ : 0; // Z
-
-			var beta = deviceOrientation.beta ? THREE.Math.degToRad( deviceOrientation.beta ) : 0; // X'
-
-			var gamma = deviceOrientation.gamma ? THREE.Math.degToRad( deviceOrientation.gamma ) : 0; // Y''
-
-			var orient = screenOrientation ? THREE.Math.degToRad( screenOrientation ) : 0; // O
-
-			var quaternion = new THREE.Quaternion();
-
-			euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
-
-			quaternion.setFromEuler( euler ); // orient the device
-
-			quaternion.multiply( q1 ); // camera looks out the back of the device, not the top
-
-			quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) ); // adjust for screen orientation
-
-			return quaternion;
-
-		}
-
-	}();
 
 	//
 	// event callbacks - update the object state
@@ -723,19 +679,38 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function handleDeviceOrientation( event ) {
+	var handleDeviceOrientation = function() {
 
-		rotateEnd.set(event.gamma, event.beta);
-		rotateDelta.subVectors(rotateEnd, rotateStart);
+		var zee = new THREE.Vector3( 0, 0, 1 );
+		var euler = new THREE.Euler();
+		var quaternion = new THREE.Quaternion();
+		var q0 = new THREE.Quaternion();
+		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
 
-		rotateLeft(rotateDelta.x * scope.tiltSpeed);
-		rotateUp(rotateDelta.y * scope.tiltSpeed);
+		return function ( event ) {
 
-		rotateStart.copy(rotateEnd);
+			var alpha = THREE.Math.degToRad( event.alpha );
+			var beta = THREE.Math.degToRad( event.beta );
+			var gamma = THREE.Math.degToRad( event.gamma );
+			var orient = THREE.Math.degToRad( screenOrientation );
 
-		scope.update();
+			euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
+			quaternion.setFromEuler( euler ); // orient the device
+			quaternion.multiply( q1 ); // camera looks out the back of the device, not the top
+			quaternion.multiply( q0.setFromAxisAngle( zee, - orient ) ); // adjust for screen orientation
 
-	}
+			euler.setFromQuaternion( quaternion, 'YXZ' );	// Read back the value
+
+			console.log( euler.toArray() )
+
+			rotateLeft(euler.x * scope.tiltSpeed);
+			rotateUp(euler.y * scope.tiltSpeed);
+
+			scope.update();
+
+		};
+
+	}();
 
 	function handleDeviceMotion( event ) {
 
@@ -980,10 +955,24 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onDeviceMotion( event ) {
 
-		if ( scope.enabled === false || !scope.enableTilt ) return;
+		if ( scope.enabled === false || scope.enableTilt === false ) return;
 
 		handleDeviceMotion( event );
 
+	}
+
+	function onScreenOrientation( event ) {
+
+		if (window.orientation)
+			screenOrientation = window.orientation || 0;
+
+		else if (window.screen.orientation)
+			switch (window.screen.orientation) {
+				case 'portrait-primary': screenOrientation = 90; break;
+				case 'portrait-secondary': screenOrientation = -90; break;
+				case 'landscape-secondary': screenOrientation = 180; break;
+				default: screenOrientation = 0; break;
+			}
 	}
 
 	//
@@ -1000,8 +989,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	window.addEventListener( 'keydown', onKeyDown, false );
 
-	if ( window.DeviceOrientationEvent )
+	if ( window.DeviceOrientationEvent ) {
+
 		window.addEventListener( 'deviceorientation', onDeviceOrientation, false );
+		window.addEventListener( 'orientationchange', onScreenOrientation, false );
+
+	}
 
 	else if ( window.DeviceMotionEvent )
 		window.addEventListener( 'devicemotion', onDeviceMotion, false )
