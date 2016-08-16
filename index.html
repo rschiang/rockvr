@@ -20,7 +20,6 @@
     </style>
     <script src="node_modules/three/build/three.min.js"></script>
     <script src="js/OrbitControls.js"></script>
-    <script src="js/DeviceOrientationControls.js"></script>
 </head>
 <body>
     <script>
@@ -36,30 +35,17 @@
             var canvas = renderer.domElement;
             document.body.appendChild(canvas);
 
-            // Set up camera and controls
+            // Set up camera
             var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
             camera.position.set(0, 0, 1000);
-            var controls = (function() {
-                var mouse = new THREE.OrbitControls(camera, canvas);
-                mouse.enableRotate = true;
-                mouse.enablePan = false;
-                mouse.enableZoom = true;
-                mouse.enableKeys = false;
-                mouse.enableDamping = false;
-                mouse.rotateSpeed = 0.618;
 
-                var gyroscopeAvailable = !!(window.DeviceOrientationEvent);
-                var gyroscope = gyroscopeAvailable ? new THREE.DeviceOrientationControls(camera) : null;
-
-                return {
-                    orbit: mouse,
-                    device: gyroscope,
-                    update: function() {
-                        if (gyroscopeAvailable && controls.orbit.state == controls.orbit.STATE.NONE)
-                            controls.device.update();
-                    }
-                }
-            })();
+            // Set up orbit controls
+            var controls = new THREE.OrbitControls(camera, canvas);
+            controls.enablePan = false;
+            controls.enableZoom = false;
+            controls.enableKeys = false;
+            controls.enableDamping = true;
+            controls.rotateSpeed = 0.33;
 
             // Declare global photosphere
             var sphere = (function() {

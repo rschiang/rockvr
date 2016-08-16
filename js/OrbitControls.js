@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author erich666 / http://erichaines.com
+ * @author snovak / https://github.com/snovak/three.js/commit/f6542ab3d95b1c746ab4d39ab5d3253720830dd3
  */
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -60,6 +61,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to false to disable panning
 	this.enablePan = true;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
+
+	// Set to false to disable tilting
+	this.enableTilt = true;
+	this.tiltSpeed = 0.01;
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
@@ -228,13 +233,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	// Expose our state
-
-	var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
-	this.STATE = STATE;
-
-	this.state = STATE.NONE;
-
 	//
 	// internals
 	//
@@ -244,6 +242,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var changeEvent = { type: 'change' };
 	var startEvent = { type: 'start' };
 	var endEvent = { type: 'end' };
+
+	var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+
+	var state = STATE.NONE;
 
 	var EPS = 0.000001;
 
@@ -664,6 +666,29 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
+	function handleDeviceOrientation( event ) {
+
+		rotateEnd.set(event.gamma, event.beta);
+		rotateDelta.subVectors(rotateEnd, rotateStart);
+
+		scope.rotateLeft(rotateDelta.x * scope.tiltSpeed);
+		scope.rotateUp(rotateDelta.y * scope.tiltSpeed);
+
+		rotateStart.copy(rotateEnd);
+
+		scope.update();
+
+	}
+
+	function handleDeviceMotion( event ) {
+
+		scope.rotateLeft(event.rotationRate.beta * scope.tiltSpeed);
+		scope.rotateUp(event.rotationRate.alpha * scope.tiltSpeed);
+
+		scope.update();
+
+	}
+
 	//
 	// event handlers - FSM: listen for events and reset state
 	//
@@ -888,6 +913,22 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
+	function onDeviceOrientation( event ) {
+
+		if ( scope.enabled === false || scope.enableTilt ) return;
+
+		handleDeviceOrientation( event );
+
+	}
+
+	function onDeviceMotion( event ) {
+
+		if ( scope.enabled === false || scope.enableTilt ) return;
+
+		handleDeviceMotion( event );
+
+	}
+
 	//
 
 	scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
@@ -901,6 +942,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
 
 	window.addEventListener( 'keydown', onKeyDown, false );
+
+	if ( window.DeviceOrientationEvent )
+		window.addEventListener( 'deviceorientation', onDeviceOrientation, false );
+
+	else if ( window.DeviceMotionEvent )
+		window.addEventListener( 'devicemotion', onDeviceMotion, false )
 
 	// force an update at start
 
