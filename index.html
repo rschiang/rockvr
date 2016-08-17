@@ -58,7 +58,7 @@
                 geometry.scale(-1, 1, 1);   // Invert face
                 return new THREE.Mesh(geometry, material);
             })();
-            sphere.rotation.y = -Math.PI * 0.56;
+            //sphere.rotation.y = -Math.PI * 0.56;
             scene.add(sphere);
 
             // Create loaders and load objects
@@ -81,17 +81,26 @@
                 loaders.object.setMaterials(material);
                 loaders.object.load('rock.obj', function(obj) {
                     obj.scale.set(1000, 1000, 1000);
-                    obj.position.set(3000, -1600, 0);
+                    obj.position.set(2800, -1200, 0);
                     obj.rotation.y = -Math.PI / 2;
                     scene.add(obj);
                 })
             })
 
-            var light = new THREE.AmbientLight( 0xffffff );
+            var light = new THREE.HemisphereLight( 0xffffff, 0xffffff, .6);
             scene.add(light);
 
-            //var helper = new THREE.AxisHelper(1000);
-            //scene.add(helper);
+            var sun = new THREE.DirectionalLight(0xffffff, 1);
+            sun.position.set(0, 4500, 0);
+            sun.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 180 * 15);
+            scene.add(sun);
+
+            var dir = sun.position.clone().normalize();
+            var arrow = new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), 2000, 0x2d7500);
+            scene.add(arrow);
+
+            var helper = new THREE.AxisHelper(1000);
+            scene.add(helper);
 
             // Finally, declare event handlers
             return {
