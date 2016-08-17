@@ -157,7 +157,7 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 				arrow.quaternion.copy( orientation );
 
-				orientationOffset.set( 0, 1, 0 );
+				orientationOffset.set( 0, 0, 1 );
 				orientationOffset.applyQuaternion( orientation );
 
 				spherical.setFromVector3( orientationOffset );
