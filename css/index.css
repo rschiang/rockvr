@@ -36,6 +36,9 @@ button {
     opacity: .54;
     transition: opacity .2s ease;
     text-align: center;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
 }
 
 button .material-icons {
