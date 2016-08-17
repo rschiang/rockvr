@@ -1,9 +1,9 @@
 // Everything in THREE namespace
-require('three/build/three.min');
+var THREE = require('expose?THREE!three');
 require('three/examples/js/loaders/MTLLoader');
 require('three/examples/js/loaders/OBJLoader');
 
 // Our own implementation
-require('./controls/OrbitControls');
+require('./OrbitControls');
 
 module.exports = THREE;

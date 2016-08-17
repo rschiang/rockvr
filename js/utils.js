@@ -3,7 +3,7 @@ function isString(obj) {
 }
 
 exports.on = function(idOrElement, e, callback) {
-    var ele = isString(idOrElement) ? document.getElementById(id) : idOrElement;
+    var ele = isString(idOrElement) ? document.getElementById(idOrElement) : idOrElement;
     ele.addEventListener(e, callback);
     return ele;
 }
