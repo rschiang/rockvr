@@ -1,8 +1,6 @@
 'use strict';
-require('three/build/three.min');
-require('./OrbitControls');
-require('three/examples/js/loaders/MTLLoader');
-require('three/examples/js/loaders/OBJLoader');
+
+var THREE = require('./three');
 require('fullscreen-api-polyfill/fullscreen-api-polyfill');
 
 var App = (function() {
