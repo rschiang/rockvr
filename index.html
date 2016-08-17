@@ -118,10 +118,10 @@
             rock.base.rotation.y = -Math.PI / 2;
             scene.add(rock.base);
 
-            loaders.font.load('node_modules/three/examples/fonts/helvetiker_regular.typeface.json', function(font) {
+            loaders.font.load('node_modules/three/examples/fonts/droid/droid_sans_regular.typeface.json', function(font) {
                 var geometry = new THREE.TextGeometry('Rock / 1000', {
                     font: font,
-                    size: 200,
+                    size: 160,
                     height: 1
                 });
                 var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
