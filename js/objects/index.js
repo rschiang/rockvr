@@ -1,5 +1,6 @@
-define(['./sphere'], function(sphere) {
+define(['./sphere', './rock'], function(sphere, rock) {
     return {
-        sphere: sphere
+        sphere: sphere,
+        rock: rock
     }
 });
