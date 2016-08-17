@@ -69,7 +69,7 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
-	this.autoRotate = false;
+	this.autoRotate = true;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
 	// Set to false to disable use of the keys
@@ -129,6 +129,12 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
 
+		var orientation = new THREE.Quaternion();
+		var lastOrientation = new THREE.Quaternion();
+
+		var orientationOffset = new THREE.Vector3();
+		var orientationSpherical = new THREE.Spherical();
+
 		return function update () {
 
 			var position = scope.object.position;
@@ -147,10 +153,22 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 			}
 
-			if ( scope.enableTilt && supportsOrientation && state === STATE.NONE ) {
+			if ( scope.enableTilt && state === STATE.NONE && deviceOrientation ) {
 
-				var deviceQuaternion = getDeviceQuaternion();
-				arrow.quaternion.copy( deviceQuaternion ).inverse();
+				getDeviceQuaternion( orientation );
+
+				//arrow.quaternion.copy( orientation );
+				//arrow.quaternion.multiply( lastOrientation.inverse() );
+
+				orientationOffset.set( 0, 1, 0 );
+				orientationOffset.applyQuaternion( orientation );
+				orientationOffset.applyQuaternion( lastOrientation.inverse() );
+
+				spherical.setFromVector3( orientationOffset );
+				rotateLeft( -spherical.theta * scope.tiltLeftSpeed );
+				rotateUp( spherical.phi * scope.tiltUpSpeed );
+
+				lastOrientation.copy( orientation );
 
 			}
 
@@ -289,7 +307,6 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 	var deviceOrientation = {};
 	var screenOrientation = 0;
-	var supportsOrientation = ( window.DeviceOrientationEvent ) ? true : false;
 
 	function getAutoRotationAngle() {
 
@@ -432,11 +449,10 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 		var zee = new THREE.Vector3( 0, 0, 1 );
 		var euler = new THREE.Euler();
-		var quaternion = new THREE.Quaternion();
 		var q0 = new THREE.Quaternion();
 		var q1 = new THREE.Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
 
-		return function() {
+		return function( quaternion ) {
 
 			var alpha = THREE.Math.degToRad( deviceOrientation.alpha || 0 );
 			var beta = THREE.Math.degToRad( deviceOrientation.beta || 0 );
@@ -1006,7 +1022,7 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 	}
 
 	else if ( window.DeviceMotionEvent )
-		window.addEventListener( 'devicemotion', onDeviceMotion, false )
+		window.addEventListener( 'devicemotion', onDeviceMotion, false );
 
 	// force an update at start
 
