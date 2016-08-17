@@ -49,6 +49,7 @@
     <script src="js/OrbitControls.js"></script>
     <script src="node_modules/three/examples/js/loaders/MTLLoader.js"></script>
     <script src="node_modules/three/examples/js/loaders/OBJLoader.js"></script>
+    <script src="node_modules/fullscreen-api-polyfill/fullscreen-api-polyfill.js"></script>
 </head>
 <body>
     <nav id="controls">
@@ -139,37 +140,20 @@
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
                     renderer.setSize(window.innerWidth, window.innerHeight);
-                },
-                fullscreen: function() {
-                    var ele = document.body;
-                    if (ele.requestFullscreen)
-                        ele.requestFullscreen();
-                    else if (ele.webkitRequestFullScreen)
-                        ele.webkitRequestFullScreen();
-                    else if (ele.mozRequestFullScreen)
-                        ele.mozRequestFullScreen();
-                },
-                exitFullscreen: function() {
-                    if (document.exitFullscreen)
-                        document.exitFullscreen();
-                    else if (document.webkitExitFullscreen)
-                        document.webkitExitFullscreen();
-                    else if (document.mozCancelFullScreen)
-                        document.mozCancelFullScreen();
-                },
-                fullscreenElement: function() {
-                    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
                 }
             };
         })();
 
         document.getElementById('fullscreen-button').addEventListener('click', function() {
-            if (App.fullscreenElement() != null) {
-                App.exitFullscreen();
-            } else {
-                App.fullscreen();
-            }
+            if (document.fullscreenElement != null)
+                document.exitFullscreen();
+            else
+                document.body.requestFullscreen();
         });
+
+        document.addEventListener('fullscreenchange', function() {
+            document.getElementById('fullscreen-button-text').innerText = (document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen');
+        })
 
         // Party!
         window.addEventListener('resize', App.resize);
