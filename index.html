@@ -87,20 +87,13 @@
                 })
             })
 
-            var light = new THREE.HemisphereLight( 0xffffff, 0xffffff, .6);
+            var light = new THREE.HemisphereLight( 0xffffff, 0xffffff, .5);
             scene.add(light);
 
             var sun = new THREE.DirectionalLight(0xffffff, 1);
             sun.position.set(0, 4500, 0);
-            sun.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 180 * 15);
+            sun.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 180 * 30); // Rotate the sun
             scene.add(sun);
-
-            var dir = sun.position.clone().normalize();
-            var arrow = new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), 2000, 0x2d7500);
-            scene.add(arrow);
-
-            var helper = new THREE.AxisHelper(1000);
-            scene.add(helper);
 
             // Finally, declare event handlers
             return {
