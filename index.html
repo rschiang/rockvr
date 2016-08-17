@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <title>NTU Go</title>
     <style>
         body, html {
@@ -17,6 +18,32 @@
             width: 100%;
             height: 100%;
         }
+
+        nav {
+            display: block;
+            position: absolute;
+            left: 1em;
+            bottom: 1em;
+        }
+
+        button {
+            display: block;
+            margin-top: 2em;
+            width: 4em;
+            height: 4em;
+            border: none;
+            border-radius: 2em;
+            background: rgba(0, 0, 0, .54);
+            color: white;
+            outline: none;
+            opacity: .54;
+            transition: opacity .2s ease;
+        }
+
+        button:hover, button.active {
+            opacity: 1;
+        }
+
     </style>
     <script src="node_modules/three/build/three.min.js"></script>
     <script src="js/OrbitControls.js"></script>
@@ -24,6 +51,11 @@
     <script src="node_modules/three/examples/js/loaders/OBJLoader.js"></script>
 </head>
 <body>
+    <nav id="controls">
+        <button id="fullscreen-button">
+            <i class="material-icons" id="fullscreen-button-text">fullscreen</i>
+        </button>
+    </nav>
     <script>
         var App = (function() {
             'use strict';
@@ -109,15 +141,35 @@
                     renderer.setSize(window.innerWidth, window.innerHeight);
                 },
                 fullscreen: function() {
-                    if (canvas.requestFullscreen)
-                        canvas.requestFullscreen();
-                    else if (canvas.webkitRequestFullScreen)
-                        canvas.webkitRequestFullScreen();
-                    else if (canvas.mozRequestFullScreen)
-                        canvas.mozRequestFullScreen();
+                    var ele = document.body;
+                    if (ele.requestFullscreen)
+                        ele.requestFullscreen();
+                    else if (ele.webkitRequestFullScreen)
+                        ele.webkitRequestFullScreen();
+                    else if (ele.mozRequestFullScreen)
+                        ele.mozRequestFullScreen();
+                },
+                exitFullscreen: function() {
+                    if (document.exitFullscreen)
+                        document.exitFullscreen();
+                    else if (document.webkitExitFullscreen)
+                        document.webkitExitFullscreen();
+                    else if (document.mozCancelFullScreen)
+                        document.mozCancelFullScreen();
+                },
+                fullscreenElement: function() {
+                    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
                 }
             };
         })();
+
+        document.getElementById('fullscreen-button').addEventListener('click', function() {
+            if (App.fullscreenElement() != null) {
+                App.exitFullscreen();
+            } else {
+                App.fullscreen();
+            }
+        });
 
         // Party!
         window.addEventListener('resize', App.resize);
