@@ -133,20 +133,7 @@ var App = (function() {
     };
 })();
 
-document.getElementById('orientation-button').addEventListener('click', function() {
-    App.controls.enableTilt = !App.controls.enableTilt;
-});
-
-document.getElementById('fullscreen-button').addEventListener('click', function() {
-    if (document.fullscreenElement != null)
-        document.exitFullscreen();
-    else
-        document.body.requestFullscreen();
-});
-
-document.addEventListener('fullscreenchange', function() {
-    document.getElementById('fullscreen-button-text').innerText = (document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen');
-});
+require('./index');
 
 // Party!
 window.addEventListener('resize', App.resize);
