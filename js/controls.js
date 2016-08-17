@@ -4,6 +4,6 @@ define(['threejs', 'camera', 'renderer'], function (THREE, camera, renderer) {
     controls.enableZoom = false;
     controls.enableKeys = false;
     controls.enableDamping = true;
-    controls.rotateSpeed = 0.33;
+    controls.rotateSpeed = 0.25;
     return controls;
 });
