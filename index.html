@@ -20,6 +20,8 @@
     </style>
     <script src="node_modules/three/build/three.min.js"></script>
     <script src="js/OrbitControls.js"></script>
+    <script src="node_modules/three/examples/js/loaders/MTLLoader.js"></script>
+    <script src="node_modules/three/examples/js/loaders/OBJLoader.js"></script>
 </head>
 <body>
     <script>
@@ -37,7 +39,7 @@
 
             // Set up camera
             var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-            camera.position.set(0, 0, 1500);
+            camera.position.set(0, 0, 1600);
 
             // Set up orbit controls
             var controls = new THREE.OrbitControls(camera, canvas);
@@ -59,8 +61,41 @@
             sphere.rotation.y = -Math.PI * 0.56;
             scene.add(sphere);
 
+            // Create loaders and load objects
+            var loaders = (function() {
+                var mtlLoader = new THREE.MTLLoader();
+                var objLoader = new THREE.OBJLoader();
+                mtlLoader.setPath('assets/');
+                objLoader.setPath('assets/');
+
+                return {
+                    material: mtlLoader,
+                    object: objLoader
+                }
+            })();
+
+            var rock;
+            loaders.material.load('rock.mtl', function(material) {
+                material.preload();
+
+                loaders.object.setMaterials(material);
+                loaders.object.load('rock.obj', function(obj) {
+                    obj.scale.set(1000, 1000, 1000);
+                    obj.position.set(3000, -1600, 0);
+                    obj.rotation.y = -Math.PI / 2;
+                    scene.add(obj);
+                })
+            })
+
+            var light = new THREE.AmbientLight( 0xffffff );
+            scene.add(light);
+
+            //var helper = new THREE.AxisHelper(1000);
+            //scene.add(helper);
+
             // Finally, declare event handlers
             return {
+                scene: scene,
                 render: function onRender() {
                     window.requestAnimationFrame(onRender);
                     controls.update();
