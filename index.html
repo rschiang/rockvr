@@ -33,7 +33,7 @@
 
         button {
             display: block;
-            margin-top: 2em;
+            margin: 1em;
             width: 4em;
             height: 4em;
             border: none;
@@ -63,6 +63,9 @@
 </head>
 <body>
     <nav id="controls">
+        <button id="orientation-button">
+            <i class="material-icons" id="orientation-button-text">explore</i>
+        </button>
         <button id="fullscreen-button">
             <i class="material-icons" id="fullscreen-button-text">fullscreen</i>
         </button>
@@ -183,6 +186,7 @@
             // Finally, declare event handlers
             return {
                 scene: scene,
+                controls: controls,
                 render: function onRender() {
                     window.requestAnimationFrame(onRender);
                     controls.update();
@@ -196,6 +200,10 @@
             };
         })();
 
+        document.getElementById('orientation-button').addEventListener('click', function() {
+            App.controls.enableTilt = !App.controls.enableTilt;
+        });
+
         document.getElementById('fullscreen-button').addEventListener('click', function() {
             if (document.fullscreenElement != null)
                 document.exitFullscreen();
@@ -205,7 +213,7 @@
 
         document.addEventListener('fullscreenchange', function() {
             document.getElementById('fullscreen-button-text').innerText = (document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen');
-        })
+        });
 
         // Party!
         window.addEventListener('resize', App.resize);
