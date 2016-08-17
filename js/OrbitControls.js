@@ -14,7 +14,7 @@
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
 //    Pan - right mouse, or arrow keys / touch: three finter swipe
 
-THREE.OrbitControls = function ( object, domElement, arrow ) {
+THREE.OrbitControls = function ( object, domElement ) {
 
 	this.object = object;
 
@@ -64,12 +64,12 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 	// Set to false to disable tilting
 	this.enableTilt = true;
-	this.tiltLeftSpeed = 0.01;
-	this.tiltUpSpeed = 0.0075;
+	this.tiltLeftSpeed = 0.001;
+	this.tiltUpSpeed = 0.001;
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
-	this.autoRotate = true;
+	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
 	// Set to false to disable use of the keys
@@ -151,18 +151,17 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 			}
 
-			if ( scope.enableTilt && state === STATE.NONE && deviceOrientation ) {
+			if ( scope.enableTilt && state === STATE.NONE && deviceOrientationValid ) {
 
 				getDeviceQuaternion( orientation );
-
-				arrow.quaternion.copy( orientation );
 
 				orientationOffset.set( 0, 0, 1 );
 				orientationOffset.applyQuaternion( orientation );
 
 				spherical.setFromVector3( orientationOffset );
-				rotateLeft( -spherical.theta * scope.tiltLeftSpeed );
-				rotateUp( spherical.phi * scope.tiltUpSpeed );
+
+				//rotateLeft( -orientationSpherical.theta * scope.tiltLeftSpeed );
+				//rotateUp( orientationSpherical.phi * scope.tiltUpSpeed );
 
 			}
 
@@ -301,6 +300,7 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 	var deviceOrientation = {};
 	var screenOrientation = 0;
+	var deviceOrientationValid = false;
 
 	function getAutoRotationAngle() {
 
@@ -725,6 +725,10 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 	}
 
 	function handleDeviceOrientation( event ) {
+
+		deviceOrientationValid = ( event.alpha !== null && event.beta !== null && event.gamma !== null );
+
+		if ( deviceOrientationValid === false ) return;
 
 		deviceOrientation = event;
 
