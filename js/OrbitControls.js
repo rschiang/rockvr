@@ -130,8 +130,6 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 		var lastQuaternion = new THREE.Quaternion();
 
 		var orientation = new THREE.Quaternion();
-		var lastOrientation = new THREE.Quaternion();
-
 		var orientationOffset = new THREE.Vector3();
 		var orientationSpherical = new THREE.Spherical();
 
@@ -157,18 +155,14 @@ THREE.OrbitControls = function ( object, domElement, arrow ) {
 
 				getDeviceQuaternion( orientation );
 
-				//arrow.quaternion.copy( orientation );
-				//arrow.quaternion.multiply( lastOrientation.inverse() );
+				arrow.quaternion.copy( orientation );
 
 				orientationOffset.set( 0, 1, 0 );
 				orientationOffset.applyQuaternion( orientation );
-				orientationOffset.applyQuaternion( lastOrientation.inverse() );
 
 				spherical.setFromVector3( orientationOffset );
 				rotateLeft( -spherical.theta * scope.tiltLeftSpeed );
 				rotateUp( spherical.phi * scope.tiltUpSpeed );
-
-				lastOrientation.copy( orientation );
 
 			}
 
