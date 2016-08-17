@@ -1,22 +1,17 @@
-define(['threejs', 'scene', 'loaders'], function(THREE, scene, loaders) {
+define(['threejs', 'three-text2d', 'scene', 'loaders'], function(THREE, Text2D, scene, loaders) {
     // Anchor object for us to position
     var anchor = new THREE.Object3D();
     anchor.position.set(2800, -1200, 0);
     anchor.rotation.y = -Math.PI / 2;
     scene.add(anchor);
 
-    var nameplate;
-    loaders.font.load('node_modules/three/examples/fonts/droid/droid_sans_regular.typeface.json', function(font) {
-        var geometry = new THREE.TextGeometry('Rock / CP 1000', {
-            font: font,
-            size: 160,
-            height: 1
-        });
-        var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
-        nameplate = new THREE.Mesh(geometry, material);
-        anchor.add(nameplate);
+    var nameplate = new Text2D.MeshText2D('小石 / CP 1000', {
+        font: '40px Trebuchet MS',
+        fillStyle: 'white',
+        antialias: true
     });
+    nameplate.scale.set(4, 4, 4);
+    anchor.add(nameplate);
 
     var body;
     loaders.mtl.load('rock.mtl', function(mtl) {
@@ -31,14 +26,15 @@ define(['threejs', 'scene', 'loaders'], function(THREE, scene, loaders) {
 
             var bodyBound = new THREE.Box3();
             bodyBound.setFromObject(body);
+
             var bodySize = bodyBound.size();
+            nameplate.position.x = bodySize.z * 0.5;
 
             nameplate.geometry.computeBoundingBox();
-            var textBound = nameplate.geometry.boundingBox;
-            var textSize = textBound.size();
+            var textSize = nameplate.geometry.boundingBox.size();
 
-            nameplate.position.x = (bodySize.z - textSize.x) * 0.5;
-            nameplate.position.y = bodySize.y + 100;
+            nameplate.position.z = bodySize.x * 0.5;
+            nameplate.position.y = bodySize.y + textSize.y + 160;
         })
     });
 
