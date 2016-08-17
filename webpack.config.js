@@ -1,10 +1,10 @@
 const webpack = require('webpack');
 
 module.exports = {
-    entry: './js/index.js',
+    entry: './js/app.js',
     output: {
         path: './bin',
-        filename: 'index.bundle.js'
+        filename: 'app.bundle.js'
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({

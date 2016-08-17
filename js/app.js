@@ -1,9 +1,9 @@
 'use strict';
-require('../node_modules/three/build/three.min');
+require('three/build/three.min');
 require('./OrbitControls');
-require('../node_modules/three/examples/js/loaders/MTLLoader');
-require('../node_modules/three/examples/js/loaders/OBJLoader');
-require('../node_modules/fullscreen-api-polyfill/fullscreen-api-polyfill');
+require('three/examples/js/loaders/MTLLoader');
+require('three/examples/js/loaders/OBJLoader');
+require('fullscreen-api-polyfill/fullscreen-api-polyfill');
 
 var App = (function() {
 
