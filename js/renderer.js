@@ -5,6 +5,7 @@ define(['threejs'], function(THREE) {
 
     // Append canvas to DOM
     var canvas = renderer.domElement;
+    canvas.id = 'scene';
     document.body.appendChild(canvas);
 
     return renderer;
