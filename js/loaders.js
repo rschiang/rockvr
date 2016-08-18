@@ -1,19 +1,29 @@
-define(['threejs'], function(THREE) {
-    var manager = new THREE.LoadingManager();
-
-    var texture = new THREE.TextureLoader(manager);
-    var font = new THREE.FontLoader(manager);
-
+define(['threejs', 'promise'], function(THREE, Promise) {
+    // Create loaders
+    var texture = new THREE.TextureLoader();
     var mtl = new THREE.MTLLoader();
-    mtl.setPath('assets/');
-
     var obj = new THREE.OBJLoader();
+
+    // Initialize base paths
+    mtl.setPath('assets/');
     obj.setPath('assets/');
+
+    var loadCallback = undefined;
+
+    var loadTexturedOBJ = function(name) {
+        return new Promise(function(resolve, reject) {
+            mtl.load(name + '.mtl', function(m) {
+                m.preload();
+                obj.setMaterials(m);
+                obj.load(name + '.obj', resolve, loadCallback, reject);
+            }, loadCallback, reject);
+        });
+    };
 
     return {
         texture: texture,
-        font: font,
         mtl: mtl,
-        obj: obj
+        obj: obj,
+        loadTexturedOBJ: loadTexturedOBJ
     }
 });
