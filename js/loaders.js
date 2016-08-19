@@ -1,12 +1,14 @@
 define(['threejs', 'promise'], function(THREE, Promise) {
     // Create loaders
     var texture = new THREE.TextureLoader();
+
+    var mtl = new THREE.MTLLoader();
+    mtl.setPath('assets/');
+
     var loadCallback = undefined;
 
     var loadTexturedOBJ = function(name) {
         return new Promise(function(resolve, reject) {
-            var mtl = new THREE.MTLLoader();
-            mtl.setPath('assets/');
             mtl.load(name + '.mtl', function(m) {
                 m.preload();
 

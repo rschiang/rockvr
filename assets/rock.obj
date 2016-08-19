@@ -1,6 +1,6 @@
 # Blender v2.77 (sub 0) OBJ File: 'Rock-Mesh.blend'
 # www.blender.org
-mtllib Rock.mtl
+mtllib rock.mtl
 o Curve.010_Mesh.008
 v 0.453245 0.971509 0.193647
 v 0.496236 0.965648 0.193647
