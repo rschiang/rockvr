@@ -1,5 +1,5 @@
-define(['threejs', 'utils', 'scene', 'camera', 'renderer', 'controls', 'light', 'objects'],
-function(THREE, utils, scene, camera, renderer, controls, light, objects) {
+define(['threejs', 'utils', 'scene', 'camera', 'renderer', 'controls', 'light', 'physics', 'objects'],
+function(THREE, utils, scene, camera, renderer, controls, light, physics, objects) {
     var app = {
         scene: scene,
         camera: camera,
@@ -11,6 +11,7 @@ function(THREE, utils, scene, camera, renderer, controls, light, objects) {
         },
         animate: function() {
             window.requestAnimationFrame( app.animate );
+            physics.update();
             controls.update();
             renderer.render(scene, camera);
         },

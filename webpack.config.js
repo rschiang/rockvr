@@ -7,9 +7,15 @@ module.exports = {
         path: './bin',
         filename: 'app.bundle.js'
     },
+    module: {
+        loaders: [
+            { test: /\.json$/, loader: 'json' }
+        ]
+    },
     resolve: {
         alias: {
-            threejs: path.resolve('js/lib/three.js')
+            threejs: path.resolve('js/lib/three.js'),
+            cannon: 'cannon/src/cannon'
         },
         modulesDirectories: ['node_modules', 'js']
     },
