@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body, html {
     margin: 0;
     padding: 0;
@@ -23,29 +27,31 @@ nav {
     z-index: 100;
 }
 
-button {
+.button {
     display: block;
     margin: .5em 1em;
-    width: 4em;
-    height: 4em;
+    padding: 1em;
+    width: 3.5em;
+    height: 3.5em;
     border: none;
-    border-radius: 2em;
+    border-radius: 50%;
     background: rgba(0, 0, 0, .54);
     color: white;
     outline: none;
     opacity: .54;
     transition: opacity .2s ease;
+    font-size: inherit;
     text-align: center;
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
 }
 
-button .material-icons {
+.button .material-icons {
     display: inline-block;
     vertical-align: middle;
 }
 
-button:hover, button.active {
+.button:hover, .button.active {
     opacity: 1;
 }
