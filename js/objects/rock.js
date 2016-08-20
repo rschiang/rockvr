@@ -35,7 +35,7 @@ function(THREE, Text2D, CANNON, scene, loaders, physics) {
 
         var halfExtent = new CANNON.Vec3(bodySize.z / 2, bodySize.y / 2, bodySize.x / 2);
         var physicalBody = new CANNON.Body({ mass: 100,
-            position: halfExtent.vadd(anchor.position),
+            position: new CANNON.Vec3(anchor.position.x + halfExtent.z, anchor.position.y + halfExtent.y, anchor.position.z + halfExtent.x),
             shape: new CANNON.Box(halfExtent),
             material: physics.createMaterial('rock')
         });
