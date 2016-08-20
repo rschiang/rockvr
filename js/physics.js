@@ -4,12 +4,13 @@ define(['cannon'], function(CANNON) {
 
     // Create world
     var world = new CANNON.World();
-    world.gravity.set(0, -4900, 0); // Half gravity
+    world.gravity.set(0, -9800, 0); // Half gravity
     world.broadphase = new CANNON.NaiveBroadphase();
     world.solver.iterations = 10;
 
     var ground = new CANNON.Body({ mass: 0 });
     ground.addShape(new CANNON.Plane());
+    ground.position.y = -1200;
     ground.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2); // Rotate from Z-up to Y-up
     world.add(ground);
 
