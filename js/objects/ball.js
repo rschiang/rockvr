@@ -7,15 +7,16 @@ function(THREE, CANNON, scene, camera, renderer, loaders, physics) {
     var body = new CANNON.Body({ mass: 1, shape: shape, material: material });
     //body.velocity.set(1300, 9200, 0);
 
-    var z = new THREE.Vector3(0, 0, 1);
     var velocity = 9300;
     var direction = new THREE.Vector3();
+    var angle = new THREE.Quaternion();
+    angle.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 6);
 
     var canvas = renderer.domElement;
     function shootBall(e) {
         body.position.set(0, 0, 0);
 
-        direction.set(0, 0, 1).unproject(camera).normalize();
+        direction.set(0, 0, 1).unproject(camera).applyQuaternion(angle).normalize();
         body.velocity.set(direction.x * velocity, direction.y * velocity, direction.z * velocity);
     }
 
