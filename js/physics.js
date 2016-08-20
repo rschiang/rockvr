@@ -8,7 +8,7 @@ define(['cannon'], function(CANNON) {
     world.broadphase = new CANNON.NaiveBroadphase();
     world.solver.iterations = 10;
 
-    var ground = new CANNON.Body({ mass: 0 });
+    var ground = new CANNON.Body({ mass: 0, material: new THREE.Material() });
     ground.addShape(new CANNON.Plane());
     ground.position.y = -1200;
     ground.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2); // Rotate from Z-up to Y-up
@@ -19,6 +19,7 @@ define(['cannon'], function(CANNON) {
 
     return {
         world: world,
+        ground: ground,
         bind: function(obj, body) {
             body.position.copy(obj.position);
             body.quaternion.copy(obj.quaternion);
