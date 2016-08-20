@@ -14,12 +14,13 @@ define(['cannon'], function(CANNON) {
     ground.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2); // Rotate from Z-up to Y-up
     world.add(ground);
 
-    // Pair of three.js - cannon.js objects to keep track of
-    var bodies = [];
+    var bodies = [];    // Pair of three.js - cannon.js objects to keep track of
+    var materials = {};
+    materials['ground'] = ground.material;
 
     return {
         world: world,
-        ground: ground,
+        materials: materials,
         bind: function(obj, body) {
             body.position.copy(obj.position);
             body.quaternion.copy(obj.quaternion);
@@ -32,6 +33,16 @@ define(['cannon'], function(CANNON) {
                 bodies[i].object.position.copy(bodies[i].body.position);
                 bodies[i].object.quaternion.copy(bodies[i].body.quaternion);
             }
+        },
+        createMaterial: function(name) {
+            var material = new CANNON.Material();
+            materials[name] = material;
+            return material;
+        },
+        createContactMaterial: function(name1, name2, options) {
+            var contactMaterial = new CANNON.ContactMaterial(materials[name1], materials[name2], options);
+            world.addContactMaterial(contactMaterial);
+            return contactMaterial;
         }
     }
 });
