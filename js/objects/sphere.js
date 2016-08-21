@@ -4,7 +4,7 @@ define(['threejs', 'scene', 'loaders'], function(THREE, scene, loaders) {
     geometry.scale(-1, 1, 1); // Invert face
 
     var material = new THREE.MeshBasicMaterial({
-        map: loaders.texture.load('assets/ntu.jpg')
+        map: loaders.texture.load('assets/leaf.jpg')
     });
 
     var sphere = new THREE.Mesh(geometry, material);

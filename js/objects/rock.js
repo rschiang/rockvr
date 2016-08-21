@@ -57,11 +57,14 @@ function(THREE, Text2D, CANNON, scene, loaders, physics, users) {
         physicalBody.addEventListener('collide', function(e) {
             if (e.body !== physics.ground) {
                 var index = Math.floor(Math.random() * users.length);
-                var user = users[index];
-                nameplate.text = user.name;
-                titleplate.text = user.title;
+                var user = users.length > 0 ? users[index] : null;
+                document.getElementById('stat').innerText = (index + 1) + '/' + users.length;
+                
+                nameplate.text = user ? user.name : '抽完了';
+                titleplate.text = user ? user.title : '謝謝大家';
                 nameplate.updateText();
                 titleplate.updateText();
+                users.splice(index, 1);
             }
         });
 
