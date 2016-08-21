@@ -20,6 +20,7 @@ define(['cannon'], function(CANNON) {
 
     return {
         world: world,
+        ground: ground,
         materials: materials,
         bind: function(obj, body) {
             body.position.copy(obj.position);

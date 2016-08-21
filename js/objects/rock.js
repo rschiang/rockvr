@@ -1,13 +1,13 @@
-define(['threejs', 'three-text2d', 'cannon', 'scene', 'loaders', 'physics'],
-function(THREE, Text2D, CANNON, scene, loaders, physics) {
+define(['threejs', 'three-text2d', 'cannon', 'scene', 'loaders', 'physics', 'users'],
+function(THREE, Text2D, CANNON, scene, loaders, physics, users) {
     // Anchor object for us to position
     var anchor = new THREE.Object3D();
-    anchor.position.set(2800, -1200, 0);
+    anchor.position.set(1800, -1200, 0);
     anchor.rotation.y = -Math.PI / 2;
     scene.add(anchor);
 
     var nameplate = new Text2D.MeshText2D('小石 / CP 1000', {
-        font: '40px Trebuchet MS',
+        font: '96px Trebuchet MS',
         fillStyle: 'white',
         antialias: true
     });
@@ -40,7 +40,15 @@ function(THREE, Text2D, CANNON, scene, loaders, physics) {
             material: physics.createMaterial('rock')
         });
         physicalBody.quaternion.copy(anchor.quaternion);
-        console.log(physicalBody.position, physicalBody.quaternion);
+        physicalBody.addEventListener('collide', function(e) {
+            if (e.body !== physics.ground) {
+                var index = Math.floor(Math.random() * users.length);
+                var user = users[index];
+                nameplate.text = user.name;
+                nameplate.updateText();
+            }
+        });
+
         physics.createContactMaterial('ball', 'rock', { friction: 0.1, restitution: 0.6 });
         physics.world.add(physicalBody);    // Manually add to overcome delta
     });
